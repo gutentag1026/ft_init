@@ -1,3 +1,65 @@
 http://www.think-like-a-computer.com/2011/03/04/computer-networking-basics/
 http://www.think-like-a-computer.com/2011/08/24/the-routing-table/
 https://linuxhint.com/enable-ssh-server-debian/
+
+01Get the list of the network interfaces of the machine without displaying any detail
+for these interfaces. Only the list of names.
+ifconfig 	stands for "interface configuration",it's used to view or change the configuration of the networl interfaces on your system".
+eth0   	is the first Ethernet interface.NIC(network interface card, aka ethernet card, network adapter)
+lo     	loopback interface
+wlan0    wireless network
+https://www.computerhope.com/unix/uifconfi.htm
+
+ifconfig -l
+
+02Identify and display the Ethernet interface characteristics
+
+ifconfig en0
+en0: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=10b<RXCSUM,TXCSUM,VLAN_HWTAGGING,AV>
+	ether 38:c9:86:56:af:a8
+	inet6 fe80::181f:87e:a947:31b%en0 prefixlen 64 secured scopeid 0x5
+	inet 10.112.7.37 netmask 0xffff0000 broadcast 10.112.255.255
+	nd6 options=201<PERFORMNUD,DAD>
+	media: autoselect (1000baseT <full-duplex,energy-efficient-ethernet>)
+	status: active
+
+solution1:grep inet finds line inet6 and inet, grep broadcast narrows the row to inet, then print the second column
+ifconfig en0 | grep inet | grep broadcast | awk '{print $2}'
+10.112.7.37
+solution2:ipconfig getifaddr en0
+
+03Identify the MAC address of the Wi-Fi card
+
+solution1: ifconfig en1 | grep ether | awk '{ print $2 }'
+
+solution2: networksetup -listallhardwareports | grep -A3 Wi-Fi | sed -n '3p' | awk '{print $3}'
+networksetup -listallhardwareports
+
+-n option suppresses the duplicate rows, 
+
+Hardware Port: Ethernet
+Device: en0
+Ethernet Address: 38:c9:86:56:af:a8
+
+Hardware Port: Wi-Fi
+Device: en1
+Ethernet Address: 28:f0:76:4b:f8:78
+
+Hardware Port: Bluetooth PAN
+Device: en4
+Ethernet Address: 28:f0:76:3f:2c:8d
+
+Hardware Port: Thunderbolt 1
+Device: en2
+Ethernet Address: 1a:00:01:fa:97:a0
+
+Hardware Port: Thunderbolt 2
+Device: en3
+Ethernet Address: 1a:00:01:fa:97:a1
+
+Hardware Port: Thunderbolt Bridge
+Device: bridge0
+Ethernet Address: 1a:00:01:fa:97:a0
+
+VLAN Configurations
