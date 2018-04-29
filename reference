@@ -129,22 +129,55 @@ sends an e-mail to root if the file is modified. Create a scheduled task to run 
 script everyday at midnight.
 man md5sum
 
-md5 = $(md5sum /etc/crontab)//create a string for crontab.txt
-if [ -e $(pwd)/hash.txt]//check does txt exist from currect working directory
+first step: install postfix
+https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-postfix-as-a-send-only-smtp-server-on-ubuntu-14-04
+apt-get install mailutils
+apt-get install postfix
+modify /etc/aliases
+change...
+root: username
+to...
+root: root
+and add...
+postfix: root
+
+dpkg-reconfigure postfix (debian package)
+command:
+to check mail -> mail
+to send mail with subject "test" to recipient root ->  mail -s "test" root
+to write something in the body(Cc:) -> Cc: dfhgdfg
+
+second step: to vi 04
+chmod +x 04 
+./04
+to execute 04
+
+md5 = $(md5sum /etc/crontab)
+//create a string for crontab.txt
+if [ -e $(pwd)/hash.txt ]
+//check does txt exist from currect working directory. the space after and before [] are very important.
 then
-	if [ "$(grep "$md5" hash.txt)" == ""]//if md5 string is emmpty
+	if [ "$(grep '$md5' hash.txt)" == "" ]
+	//if md5 string is not found
 	then
-		echo $md5 > hash.txt//write md5 string to txt
-		mail -s "Change to /etc/crontab" root < /etc/crontab//deliver mail to with subject " " to recipient
+		echo $md5 > $(pwd)/hash.txt
+		//write md5 string to txt
+		mail -s "Change to /etc/crontab" root < /etc/crontab
+		//deliver mail to with subject " " to recipient
 		root < /etc/crontab sends whatever is in crontab as the body to root
 	fi 
 else 
-	echo $md5 > $(pwd)/hash.txt// to create hash.txt on the first call, cuz no txt exist previously
-	mail -s "Change to /etc/crontab" root < /etc/crontab//send crontab content as body to root with subject ""
+	echo $md5 > $(pwd)/hash.txt
+	// to create hash.txt on the first call, cuz no txt exist previously
+	mail -s "Change to /etc/crontab" root < /etc/crontab
+	//send crontab content as body to root with subject ""
 fi
 
-5. Write a script which displays 42.
+third step:
+testing -> change /etc/crontab file content to see mail
 
+5. Write a script which displays 42.
+echo 42
 
 
 
