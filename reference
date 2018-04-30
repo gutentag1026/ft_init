@@ -67,29 +67,139 @@ VLAN Configurations
 4. Identifiy the default gateway in the routing table
 netstat -nr | grep default | head -n1 | awk '{ print $2}'
 
+-n – Show numerical addresses instead of hostname
+-r – Display the kernel routing tables
+
 netstat - Print network connections, routing tables, interface statistics, masquerade connections, and multicast memberships
 show network status, head -n1 print first line, awk '{print $2}' print column 2 of that line.
 
 5. Identify the IP address of the DNS that responds to the following url: slash16.org
 
+nslookup slash16.org | awk '/Address/{ print $2}' | tail -n8
+
 6. Get the complete path of the file that contains the IP address of the DNS server
 you’re using
+
+/etc directory inside the resolv.conf file.
+
 7. Query an external DNS server on the slash16.org domain name (ie. : google
 8.8.8.8)
+
+dig slash16.org @8.8.8.8 | grep slash16.org. | tail -n8 | awk '{print$5}'
+dig -> DNS lookup utility  (domain information groper) 
+@8.8.8.8 -> external DNS server google uses
+dig slash16.org -> would give the same results of ip addresses of slash16.org
+
+dig slash16.org @8.8.8.8 | grep slash16.org. | tail -n8 | awk '{print$5}'
+
 8. Find the provider of slash16.org
+
+Find out IP address and its owner:
+$ host -t a google.com
+
+Sample outputs:
+google.com has address 209.85.231.104
+
+Now, get ip address information:
+$ whois 209.85.231.104
+
 9. Find the external IP of 42.fr
-6
+dig +short 42.fr
+or
+nslookup 42.fr
+or
+ping 42.fr -c 1
+(only returns 1 IP, it pings only once)
+
 System and Network Administration init
 10. Identify the network devices between your computer and the slash16.org domain
+
+traceroute slash16.org
+ The Internet is an aggregation of network hardware, connected together by gateways.  
+e1z2r7p37% traceroute slash16.org
+traceroute: Warning: slash16.org has multiple addresses; using 54.230.142.45
+traceroute to slash16.org (54.230.142.45), 64 hops max, 52 byte packets
+ 1  10.112.254.254 (10.112.254.254)  0.888 ms  0.995 ms  1.167 ms
+ 2  192.168.0.2 (192.168.0.2)  1.067 ms  1.097 ms  1.253 ms
+ 3  nat (10.90.1.11)  0.226 ms  0.868 ms  0.273 ms
+ 4  64.62.224.30 (64.62.224.30)  0.940 ms  1.037 ms  1.674 ms
+ 5  64.62.224.253 (64.62.224.253)  3.512 ms  3.518 ms  3.416 ms
+ 6  64.62.224.249 (64.62.224.249)  4.740 ms  3.713 ms  6.228 ms
+ 7  v1851.core2.fmt2.he.net (216.218.200.77)  13.951 ms  3.552 ms  13.201 ms
+ 8  10ge7-3.core3.fmt2.he.net (184.105.222.141)  4.695 ms  3.325 ms  3.357 ms
+ 9  100ge14-2.core1.sjc2.he.net (72.52.92.246)  5.583 ms
+    10ge7-9.core1.sjc2.he.net (184.105.222.14)  3.776 ms
+    100ge14-2.core1.sjc2.he.net (72.52.92.246)  4.545 ms
+10  equinix02-sfo5.amazon.com (206.223.116.236)  4.033 ms
+    equinix01-sfo5.amazon.com (206.223.116.177)  4.330 ms  3.739 ms
+11  52.93.70.194 (52.93.70.194)  4.948 ms
+    52.93.70.182 (52.93.70.182)  4.644 ms
+    52.93.70.198 (52.93.70.198)  4.711 ms
+12  54.240.242.121 (54.240.242.121)  4.275 ms
+    54.240.242.39 (54.240.242.39)  4.963 ms
+    54.240.242.37 (54.240.242.37)  3.958 ms
+13  205.251.230.89 (205.251.230.89)  4.841 ms
+    205.251.230.93 (205.251.230.93)  16.978 ms
+    205.251.230.95 (205.251.230.95)  4.995 ms
+14  * * *
+15  * * *
+16  * * *
+17  server-54-230-142-45.sfo5.r.cloudfront.net (54.230.142.45)  4.619 ms  3.906 ms  3.973 ms
+
+The first line represents your home router (assuming you’re behind a router), 
+the next lines represent your ISP, 
+and each line further down represents a router that’s further away.
+
+RTT1, RTT2, RTT3: This is the round-trip time that it takes for a packet to get to a hop and back to your computer (in milliseconds). 
+1->to router 2->router to another website's router 3->back
+ *is package loss
+
 11. Use the output of the previous command to find the name and IP address of the
 device that makes the link between you (local network) and the outside world
+
+nat (10.90.1.11) -> network address translator
+
 12. Check that the server with the 10.51.1.253 IP address is reachable from your
 computer.
+
+ping 10.51.1.253
+
 13. Figure out the server type.
-14. Use the Reverse DNS to find out the name of the server linked to the 10.51.1.81
-IP address
+
+nslookup 10.51.1.253
+Server:		10.51.1.253
+Address:	10.51.1.253#53
+
+253.1.51.10.in-addr.arpa	name = dhcp-dns.42.us.org.
+253.1.51.10.in-addr.arpa	name = dhcp.42.us.org.
+
+the server type is dhcp (dynamic host configuration protocol), a network protocol that enables a server to automatically assign an IP address to a computer from a defined range of numbers (i.e., a scope) configured for a given network.
+
+14. Use the Reverse DNS to find out the name of the server linked to the 10.51.1.81 IP address
+
+nslookup 10.51.1.81
+
+would give you 
+Server:		10.51.1.253
+Address:	10.51.1.253#53
+
+81.1.51.10.in-addr.arpa	name = dpm-master.42.us.org.
+
+Address and Routing Parameter Area (ARPA) top-level domain of the Internet
+top level domain -> org
+middle level domain -> us
+..........................
+
+Reverse DNS means lookup through ip address rather than human readable like www.google.com
+
 15. What file contains the local DNS entries?
+
+/etc/hosts
+
 16. Make the intra.42.fr address reroute to 46.19.122.85
+
+echo "46.19.122.85 intra.42.fr" >> /etc/hosts
+
 V.3 System
 1. In what file can you find the installed version of your Debian?
 2. What command can you use to rename your system?
@@ -158,7 +268,7 @@ if [ -e $(pwd)/hash.txt ]
 //check does txt exist from currect working directory. the space after and before [] are very important.
 then
 	if [ "$(grep '$md5' hash.txt)" == "" ]
-	//if md5 string is not found
+	//if md5 string is not found, that means strings generated from crontab changed
 	then
 		echo $md5 > $(pwd)/hash.txt
 		//write md5 string to txt
