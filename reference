@@ -324,11 +324,18 @@ echo "* 4 * * 0 apt-get update >> /var/log/update_script.log && apt-get upgrade 
 sorted by size.
 
 /*
+**to give exetution rights -> chmod +x filename
+**./03 . the second dot is parameter . means current folder
+**./03 directory_name $1 -> is directory_name as the first parameter
 **to run the script in Debian, put bash program name, to access the currect folder do dot, ^ is the escape, to grab anything start with -,every file starts w -, $1 reaches the first argument
 */
 if [ $1 ] ; then
-	ls -lS | grep ^-
+	ls -lS $1 | grep ^-
 fi
+/*
+**directory begins with drwxr-xr-x 2 root....... file begins w -rw-----1 root .......
+*/
+
 
 4. Write a script which monitors the modifications made to the /etc/crontab file and
 sends an e-mail to root if the file is modified. Create a scheduled task to run this
