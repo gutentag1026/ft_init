@@ -283,7 +283,8 @@ fg -> bring jobs in the background in the foreground
 16. Find the service which makes it possible to run specific tasks following a regular
 schedule
 
-crontab which mean timetable that allows you to excute task at regular intervals. it's set as minute hour day month weekday. so 0 1 2 3 4/bin/execute/this/script.sh means it runs on 1am, 2nd of March, on every Thursday.
+cron, which mean timetable that allows you to excute task at regular intervals. it's set as minute hour day month weekday. so 0 1 2 3 4/bin/execute/this/script.sh means it runs on 1am, 2nd of March, on every Thursday.
+crontab is the file...
 
 17. Find the command which gives the list of firewall rules
 
